@@ -1,15 +1,27 @@
-import { Link } from "expo-router";
-import { Text, View, StyleSheet} from "react-native";
-import EvilIcons from '@expo/vector-icons/EvilIcons';
+
+import { Text, View, StyleSheet, FlatList} from "react-native";
 import FoodListItem from "../src/components/foodListItem";
 
+
+
+const foodItems = [
+  {label: "Pizza", cal: 75, brand: 'Dominoes'}, 
+  {label: "Apple", cal: 75, brand: 'generic'},
+  {label: "Chocolate", cal: 75, brand: 'generic'},
+  {label: "Candy", cal: 100, brand: 'generic'},
+  {label: "Condoms", cal: 1, brand: 'generic'},
+
+];
 export default function Index() {
   return (
     <View
       style={styles.container}>
         {/* Food View Item  */}
-      <FoodListItem item={{label: "Pizza", cal: 75, brand: 'Dominoes'}}/>
-      <FoodListItem item={{label: "Apple", cal: 75, brand: 'generic'}}/>
+      <FlatList 
+      data = {foodItems}
+      renderItem={({item}) => <FoodListItem item = {item} />}
+      contentContainerStyle={{gap: 5}}
+      />
     </View>
   );
 }
