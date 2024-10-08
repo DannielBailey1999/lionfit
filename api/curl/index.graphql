@@ -7,6 +7,7 @@ type Food {
   knownAs: String
   label: String
   nutrients: Nutrients
+  brand: String
 }
 
 type HintsEntry {
