@@ -1,8 +1,9 @@
 
-import { Text, View, StyleSheet, FlatList, TextInput, Button, ActivityIndicator} from "react-native";
+import { Text, View, StyleSheet, FlatList, TextInput, Button, ActivityIndicator,} from "react-native";
 import FoodListItem from "../src/components/foodListItem";
 import { useState } from "react";
 import {gql, useLazyQuery} from "@apollo/client";
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
 
 
@@ -21,9 +22,18 @@ const query = gql`query MyQuery($ingr: String = "") {
   }
 }`;
 
+const foodItems = [
+  {label: "Pizza", cal: 75, brand: 'Dominoes'}, 
+  {label: "Apple", cal: 75, brand: 'generic'},
+  {label: "Chocolate", cal: 75, brand: 'generic'},
+  {label: "Candy", cal: 100, brand: 'generic'},
+  {label: "Condoms", cal: 1, brand: 'generic'},
 
+];
 export default function SearchScreen() {
   const [search, setSearch] = useState('');
+  const [scannerEnabled, setScannerEnabled] = useState(false);
+
   const [doSearch, { data, loading, error }] = useLazyQuery(query, { variables: { ingr: search } });
 
   const performSearch = () => {
@@ -31,6 +41,7 @@ export default function SearchScreen() {
     setSearch('');
   }
 
+  //request only if permission isnt granted then we can ask again 
   // if (loading){
   //   return <ActivityIndicator />;
 
@@ -42,30 +53,31 @@ export default function SearchScreen() {
     
   }
 
-  console.log(JSON.stringify(data, null, 2));
+
 
   const items = data?.search?.hints || [];
+
+
   
-  const addToLog = (item: any) => {
-    console.log(`Added ${item.food.label} to the log`); // Replace this with actual log functionality
-  };
-
-
   return (
     <View
       style={styles.container}>
-        {/* Food View Item  */}
+        {/* search/input view */}
+        <View style={{flexDirection: 'row', alignItems: 'center', gap: 10}}>
         <TextInput 
         value = {search}
         onChangeText= {setSearch}
         placeholder="Search..." 
         style={styles.input}/>
+        
+        </View>
+        
         {search && <Button title="Search" onPress={performSearch}/>}
 
         {loading && <ActivityIndicator/>}
       <FlatList 
       data = {items}
-      renderItem={({item}) => <FoodListItem item={item} onAdd={() => addToLog(item)} />}
+      renderItem={({item}) => <FoodListItem item = {item} />}
       keyExtractor={(item) => item.food.foodId}
       ListEmptyComponent={() => <Text>Search a food</Text>}
       contentContainerStyle={{gap: 5}}
@@ -80,11 +92,13 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 10,
     gap: 5,
+    backgroundColor: 'white', 
   },
   input: {
-    backgroundColor: '#F2F2F2',
-    padding: 10, 
-    borderRadius: 10, 
+    backgroundColor: '#f2f2f2',
+    padding: 10,
+    borderRadius: 20,
+    flex: 1,
   },
 
 })
