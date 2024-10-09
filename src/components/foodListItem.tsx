@@ -1,7 +1,8 @@
 import { Text, View, StyleSheet} from "react-native";
 import EvilIcons from '@expo/vector-icons/EvilIcons';
+import { gql, useMutation } from "@apollo/client";
+import { useRouter } from "expo-router";
 
-// Define the type for the item
 // Define the type for the item
 interface FoodItem {
     food: {
@@ -10,11 +11,38 @@ interface FoodItem {
         ENERC_KCAL: number; // Calories in kilocalories
       };
       brand: string; // Add the brand field here
+      foodId: string;
     };
   }
 
 
+  const mutation = gql`mutation MyMutation($food_id: String!, $kcal: Int!, $label: String!, $user_id: String!) {
+  insertFood_log(food_id: $food_id, kcal: $kcal, label: $label, user_id: $user_id) {
+    created_at
+    food_id
+    id
+    kcal
+    label
+    user_id
+  }
+}`;
+
 const FoodListItem = ({ item }: { item: FoodItem })=> {
+  const [logFood, {data, loading, error}] = useMutation(mutation, {
+    refetchQueries: ['foodLogsForDate']
+  });
+  const router = useRouter()
+  const onPlusPress = async () => {
+    await logFood({
+      variables: {
+        "food_id": item.food.foodId,
+        "kcal": item.food.nutrients.ENERC_KCAL, 
+        "label": item.food.label,
+        "user_id": "danniel",
+      },
+    });
+    router.back();
+  };
   return (
     <View 
       style={styles.container}>
@@ -26,7 +54,9 @@ const FoodListItem = ({ item }: { item: FoodItem })=> {
             {item.food.nutrients.ENERC_KCAL} cal, {item.food.brand || 'Unknown brand'}
             </Text>
           </View>
-        <EvilIcons name="plus" size={28} color="royalblue" />
+        <EvilIcons 
+        onPress={onPlusPress}
+        name="plus" size={28} color="royalblue" />
         </View>
       
   );
